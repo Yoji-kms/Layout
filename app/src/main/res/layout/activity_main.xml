@@ -29,6 +29,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarId"
+        android:linksClickable="true"
+        android:autoLink="web"
         android:textSize="16sp"
         android:paddingBottom="8dp"/>
 
