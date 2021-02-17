@@ -91,7 +91,7 @@
         android:id="@+id/resetCountersBtnId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/reset_counters"
+        android:text="@string/set_random_num_to_counters"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

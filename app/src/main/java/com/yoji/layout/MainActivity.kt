@@ -4,22 +4,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.Button
-import android.widget.CheckBox
 import android.widget.TextView
+import com.yoji.layout.databinding.ActivityMainBinding
 import java.lang.NumberFormatException
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
-    private val likesCheckBox:CheckBox by lazy{ findViewById(R.id.likesCheckBoxId) }
-    private val shareCounterTxtView:TextView by lazy { findViewById(R.id.shareCounterTxtViewId) }
-    private val watchesCounterTxtView:TextView by lazy { findViewById(R.id.watchesCounterTxtViewId) }
-    private val resetCountersBtn:Button by lazy { findViewById(R.id.resetCountersBtnId) }
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    var likesCounter = 0
+    var shareCounter = 0
+    var watchesCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         init()
     }
@@ -31,28 +30,29 @@ class MainActivity : AppCompatActivity() {
         in 1_000_000..9_999_999 -> (this / 1_000).roundToThousandsWithOneDecimal().toString() + "M"
         in 10_000_000..999_999_999 -> (this / 1_000_000).toString() + "M"
         in 1_000_000_000..Int.MAX_VALUE -> (this / 1_000_000).roundToThousandsWithOneDecimal()
-                .toString() + "B"
+            .toString() + "B"
         else -> "0"
     }
 
     private fun Int.roundToThousandsWithOneDecimal(): Double =
-            (this / 100).toDouble() / 10
+        (this / 100).toDouble() / 10
 
-    private fun init (){
+    private fun init() {
         initCheckBox()
-        initTxtView(shareCounterTxtView)
-        initTxtView(watchesCounterTxtView)
-        initBtn()
+        shareCounter = initTxtView(binding.shareCounterTxtViewId)
+        watchesCounter = initTxtView(binding.watchesCounterTxtViewId)
+        initBtns()
     }
 
-    private fun initTxtView(txtView: TextView) {
+    private fun initTxtView(txtView: TextView): Int {
         txtView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 try {
-                    txtView.text = s.toString().toInt().toFormattedString()
+                    if (txtView.text.toString().toInt().toFormattedString() != s.toString())
+                        txtView.text = s.toString().toInt().toFormattedString()
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
                 }
@@ -61,17 +61,22 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
             }
         })
-        txtView.text = Random.nextInt(from = 0, until = Int.MAX_VALUE).toString()
+        val result = Random.nextInt(from = 0, until = 999)
+        txtView.text = result.toString()
+        return result
     }
 
     private fun initCheckBox() {
-        likesCheckBox.addTextChangedListener(object : TextWatcher {
+        binding.likesCheckBoxId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 try {
-                    likesCheckBox.text = s.toString().toInt().toFormattedString()
+                    if (binding.likesCheckBoxId.text.toString().toInt().toFormattedString() !=
+                        s.toString()
+                    )
+                        binding.likesCheckBoxId.text = s.toString().toInt().toFormattedString()
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
                 }
@@ -80,14 +85,36 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
             }
         })
-        likesCheckBox.text = Random.nextInt(from = 0, until = Int.MAX_VALUE).toString()
+
+        binding.likesCheckBoxId.setOnCheckedChangeListener { buttonView, isChecked ->
+            buttonView.text = if (isChecked) {
+                likesCounter++
+                (likesCounter).toFormattedString()
+            } else {
+                likesCounter--
+                (likesCounter).toFormattedString()
+            }
+        }
+
+        likesCounter = Random.nextInt(from = 0, until = 999)
+
+        binding.likesCheckBoxId.text = likesCounter.toString()
     }
 
-    private fun initBtn(){
-        resetCountersBtn.setOnClickListener {
-            likesCheckBox.text = Random.nextInt(from = 0, until = Int.MAX_VALUE).toString()
-            shareCounterTxtView.text = Random.nextInt(from = 0, until = Int.MAX_VALUE).toString()
-            watchesCounterTxtView.text = Random.nextInt(from = 0, until = Int.MAX_VALUE).toString()
+    private fun initBtns() {
+        binding.resetCountersBtnId.setOnClickListener {
+            likesCounter = Random.nextInt(from = 0, until = Int.MAX_VALUE)
+            watchesCounter = Random.nextInt(from = 0, until = Int.MAX_VALUE)
+            shareCounter = Random.nextInt(from = 0, until = Int.MAX_VALUE)
+            binding.likesCheckBoxId.text = likesCounter.toString()
+            binding.shareCounterTxtViewId.text = shareCounter.toString()
+            binding.watchesCounterTxtViewId.text = watchesCounter.toString()
+        }
+
+        binding.shareImgBtnId.setOnClickListener {
+            shareCounter++
+            binding.shareCounterTxtViewId.text =
+                (shareCounter).toFormattedString()
         }
     }
 }
